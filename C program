@@ -1,0 +1,127 @@
+#include<stdio.h>
+
+void accept(int matrix[10][10], int rows, int columns);
+void display(int matrix[10][10], int rows, int columns);
+void compactForm(int matrix[10][10], int rows, int columns, int compact[20][3]); 
+void displayCompact(int compact[20][3]);
+void simpleTranspose(int compact[20][3], int transpose[20][3]);
+void fastTranspose(int compact[20][3], int transpose[20][3]);
+
+void accept(int matrix[10][10], int rows, int columns) {
+    printf("Enter the elements:\n"); 
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            scanf("%d", &matrix[i][j]); 
+        }
+    } 
+}
+
+void display(int matrix[10][10], int rows, int columns) {
+    printf("The Matrix You Entered is:\n"); 
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            printf("%d\t", matrix[i][j]); 
+        }
+        printf("\n"); 
+    }
+}
+
+void compactForm(int matrix[10][10], int rows, int columns, int compact[20][3]) {
+    int k = 1;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            if (matrix[i][j] != 0) {
+                compact[k][0] = i; 
+                compact[k][1] = j; 
+                compact[k][2] = matrix[i][j]; 
+                k++;
+            } 
+        }
+    }
+    compact[0][0] = rows; 
+    compact[0][1] = columns; 
+    compact[0][2] = k - 1;
+}
+
+void displayCompact(int compact[20][3]) {
+    for (int i = 0; i <= compact[0][2]; i++) {
+        for (int j = 0; j < 3; j++) {
+            printf("%d\t", compact[i][j]); 
+        }
+        printf("\n"); 
+    }
+}
+
+void simpleTranspose(int compact[20][3], int transpose[20][3]) {
+    int k = 1;
+    for (int i = 0; i < compact[0][1]; i++) {
+        for (int j = 1; j <= compact[0][2]; j++) {
+            if (compact[j][1] == i) {
+                transpose[k][0] = compact[j][1]; 
+                transpose[k][1] = compact[j][0]; 
+                transpose[k][2] = compact[j][2]; 
+                k++;
+            } 
+        }
+    }
+    transpose[0][0] = compact[0][1]; 
+    transpose[0][1] = compact[0][0]; 
+    transpose[0][2] = compact[0][2];
+}
+
+void fastTranspose(int compact[20][3], int transpose[20][3]) {
+    int rowterm[20];
+    int rowpos[20];
+    int loc;
+    
+    for (int i = 0; i < compact[0][1]; i++){
+        rowterm[i] = 0;
+    }
+    
+    for (int i = 1; i < compact[0][2]; i++){
+        rowterm[compact[i][1]]++; 
+        rowpos[0] = 1;
+    }
+    
+    for (int i = 1; i < compact[0][1]; i++) {
+        rowpos[i] = rowpos[i - 1] + rowterm[i - 1];
+    }
+    
+    for (int j = 1; j < compact[0][2]; j++) {
+        loc = rowpos[compact[j][1]]; 
+        transpose[loc][0] = compact[j][1]; 
+        transpose[loc][1] = compact[j][0]; 
+        transpose[loc][2] = compact[j][2]; 
+        rowpos[compact[j][1]]++;
+    }
+    
+    transpose[0][0] = compact[0][1]; 
+    transpose[0][1] = compact[0][0]; 
+    transpose[0][2] = compact[0][2];
+}
+
+int main() {
+    int matrix[10][10], rows, columns, compact[20][3], transpose[20][3]; 
+    
+    printf("Enter the number of rows of matrix:");
+    scanf("%d", &rows);
+    
+    printf("Enter the number of columns of matrix:");
+    scanf("%d", &columns);
+    
+    accept(matrix, rows, columns);
+    display(matrix, rows, columns); 
+    compactForm(matrix, rows, columns, compact); 
+    printf("The compact form is:\n"); 
+    displayCompact(compact);
+    
+    printf("\n ** Simple transpose **:\n"); 
+    simpleTranspose(compact, transpose); 
+    displayCompact(transpose);
+    
+    printf("\n ** Fast Transpose **\n"); 
+    fastTranspose(compact, transpose); 
+    displayCompact(transpose);
+    
+    return 0; 
+}
